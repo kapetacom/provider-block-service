@@ -1,0 +1,20 @@
+kind: core.blockware.com/v1/BlockType
+metadata:
+  id: blocks.blockware.com/v1/Service
+  name: Service
+
+spec:
+
+  schema:
+    type: object
+    properties:
+      target:
+        $ref: core.blockware.com/v1/LanguageTarget
+      entities:
+        $ref: core.blockware.com/v1/EntityList
+      consumers:
+        $ref: core.blockware.com/v1/ResourceList
+      providers:
+        $ref: core.blockware.com/v1/ResourceList
+    required:
+      - target

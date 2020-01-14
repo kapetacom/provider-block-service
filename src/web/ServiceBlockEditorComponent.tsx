@@ -231,12 +231,12 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                          help="This tells the code generation process which target programming language to use."
                          validation={'required'}>
                     <select name="targetKind"
-                            value={this.spec.target.kind}
+                            value={this.spec.target.kind.toLowerCase()}
                             onChange={(evt) => {this.handleTargetKindChanged(evt.target.value)}}>
 
                         <option value="">Select target...</option>
                         {BlockTargetProvider.list(this.props.kind).map((targetConfig, ix) => {
-                            return <option key={ix} value={targetConfig.kind}>{targetConfig.name}</option>
+                            return <option key={ix} value={targetConfig.kind.toLowerCase()}>{targetConfig.name}</option>
                         })}
                     </select>
                 </FormRow>

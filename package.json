@@ -6,6 +6,10 @@
     "keywords": [
         "blockware"
     ],
+    "private": false,
+    "publishConfig": {
+        "access": "public"
+    },
     "license": "MIT",
     "scripts": {
         "prepublishOnly": "npm run build",

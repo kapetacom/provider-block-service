@@ -1,44 +1,55 @@
 {
-    "name": "@blockware/provider-block-service",
-    "version": "0.0.2",
-    "main": "index.js",
-    "description": "Provides block type for backend microservices",
-    "keywords": [
-        "blockware"
-    ],
-    "private": false,
-    "publishConfig": {
-        "access": "public"
-    },
-    "license": "MIT",
-    "scripts": {
-        "prepublishOnly": "npm run build",
-        "build": "webpack"
-    },
-    "dependencies": {},
-    "devDependencies": {
-        "@babel/cli": "^7.7.7",
-        "@babel/core": "^7.7.7",
-        "@babel/plugin-proposal-class-properties": "^7.5.0",
-        "@babel/plugin-proposal-decorators": "^7.4.4",
-        "@babel/preset-env": "^7.5.0",
-        "@babel/preset-react": "^7.7.4",
-        "@babel/preset-typescript": "^7.3.3",
-        "@blockware/ui-web-components": "0.0.7",
-        "@blockware/ui-web-context": "0.0.7",
-        "@blockware/ui-web-utils": "0.0.6",
-        "@types/lodash": "^4.14.149",
-        "@types/react": "^16.9.17",
-        "babel-loader": "^8.0.6",
-        "css-loader": "^3.4.2",
-        "json-loader": "^0.5.7",
-        "less": "^3.10.3",
-        "less-loader": "^5.0.0",
-        "lodash": "^4.17.15",
-        "style-loader": "^1.1.2",
-        "webpack": "^4.41.5",
-        "webpack-cli": "^3.3.10",
-        "yaml": "^1.7.2",
-        "yaml-loader": "^0.5.0"
-    }
+  "name": "@blockware/provider-block-service",
+  "version": "0.0.2",
+  "main": "index.js",
+  "description": "Provides block type for backend microservices",
+  "keywords": [
+    "blockware"
+  ],
+  "private": false,
+  "publishConfig": {
+    "access": "public"
+  },
+  "license": "MIT",
+  "scripts": {
+    "prepublishOnly": "npm run build",
+    "build": "webpack",
+    "storybook": "start-storybook",
+    "build-storybook": "build-storybook"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@babel/cli": "^7.7.7",
+    "@babel/core": "^7.7.7",
+    "@babel/plugin-proposal-class-properties": "^7.5.0",
+    "@babel/plugin-proposal-decorators": "^7.4.4",
+    "@babel/preset-env": "^7.5.0",
+    "@babel/preset-react": "^7.7.4",
+    "@babel/preset-typescript": "^7.3.3",
+    "@blockware/ui-web-components": "0.0.8",
+    "@blockware/ui-web-context": "0.0.10",
+    "@blockware/ui-web-types": "0.0.10",
+    "@blockware/ui-web-utils": "0.0.6",
+    "@storybook/addon-actions": "^5.3.3",
+    "@storybook/addon-links": "^5.3.3",
+    "@storybook/addons": "^5.3.3",
+    "@storybook/react": "^5.3.3",
+    "@types/lodash": "^4.14.149",
+    "@types/react": "^16.9.17",
+    "babel-loader": "^8.0.6",
+    "css-loader": "^3.4.2",
+    "guid-typescript": "^1.0.9",
+    "json-loader": "^0.5.7",
+    "less": "^3.10.3",
+    "less-loader": "^5.0.0",
+    "lodash": "^4.17.15",
+    "mobx": "^5.15.2",
+    "mobx-react": "^6.1.5",
+    "socket.io-client": "^2.3.0",
+    "style-loader": "^1.1.2",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10",
+    "yaml": "^1.7.2",
+    "yaml-loader": "^0.5.0"
+  }
 }

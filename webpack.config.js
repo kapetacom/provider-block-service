@@ -32,7 +32,7 @@ module.exports = {
             {
                 test: /\.less$/,
                 loaders: ["style-loader", "css-loader", "less-loader"],
-                include: Path.resolve(__dirname, "./src")
+                include: Path.resolve(__dirname, "./")
             },
             {
                 test: /\.ya?ml$/,

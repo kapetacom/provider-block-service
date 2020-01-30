@@ -1,6 +1,6 @@
 {
   "name": "@blockware/provider-block-service",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "index.js",
   "description": "Provides block type for backend microservices",
   "keywords": [
@@ -12,6 +12,7 @@
   },
   "license": "MIT",
   "scripts": {
+    "start": "nodemon -e js,jsx,less,ts,tsx,json --ignore dist/ --ignore web/ --ignore stories/ --ignore node_modules/ --exec 'npm run build'",
     "prepublishOnly": "npm run build",
     "build": "webpack",
     "storybook": "start-storybook",

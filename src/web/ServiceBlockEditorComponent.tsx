@@ -11,7 +11,7 @@ import {
     TargetConfigProps,
     EntityConfigProps,
     hasEntityReference,
-    SchemaEntity,
+    SchemaEntity
 } from "@blockware/ui-web-types";
 
 import {
@@ -26,6 +26,7 @@ import {
     PanelAlignment,
     PanelSize,
     EntityForm,
+    EntityList,
     EntityFormModel,
     FormButtons,
     FormContainer
@@ -111,7 +112,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     };
 
     @action
-    private handleEditEntity(entity:SchemaEntity) {
+    private handleEditEntity = (entity:SchemaEntity) => {
         if (!this.sidePanel) {
             return;
         }
@@ -122,7 +123,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     @action
-    private handleCreateEntity() {
+    private handleCreateEntity = () => {
         if (!this.sidePanel) {
             return;
         }
@@ -132,7 +133,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     @action
-    private handleRemoveEntity(entity:SchemaEntity) {
+    private handleRemoveEntity = (entity:SchemaEntity) => {
         if (!this.spec.entities) {
             return;
         }
@@ -143,8 +144,12 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             return;
         }
 
+        let tempList = _.clone(this.spec.entities);    
+        _.pull(tempList, entity);
 
-        _.pull(this.spec.entities, entity);
+        this.spec.entities = tempList;
+
+        this.stateChanged();
     }
 
     @action
@@ -153,7 +158,12 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     };
 
     @action
-    private handleEntitySaved = () => {
+    private handleEntitySaved = () => {       
+        //this.spec.entities is set to an empty array in case it`s undefined, otherwise the function will exit in the next Return.
+        if(!this.spec.entities){
+            this.spec.entities = [];
+        }
+        
         if (!this.currentEntity ||
             !this.originalEntity ||
             !this.spec.entities) {
@@ -171,14 +181,18 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             return;
         }
 
-        Object.assign(this.originalEntity, this.currentEntity.getData());
+        const ix = this.spec.entities.indexOf(this.originalEntity);
 
-        if (this.spec.entities.indexOf(this.originalEntity) === -1) {
+        if (ix === -1) {
             //Creating entity
-            this.spec.entities.push(this.originalEntity);
+            this.spec.entities.push(this.currentEntity.getData());
+        } else {
+            this.spec.entities[ix] = this.currentEntity.getData();
         }
 
         this.sidePanel && this.sidePanel.close();
+
+        this.stateChanged();
     };
 
     private renderTargetConfig() {
@@ -249,53 +263,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private renderEntities() {
         const entities = this.spec.entities || [];
         return (
-            <div className={'entities-list'}>
-                <ul>
-                {
-                    entities.map((entity,ix) => {
-
-                        const inUse = hasEntityReference(this.spec, entity.name);
-
-                        const className = toClass({
-                            'entity': true,
-                            'used':inUse
-                        });
-                        return (
-                            <li key={ix} className={className}>
-                                <span className={'name'}>{entity.name}</span>
-
-                                {inUse &&
-                                    <span className={'note'}>( In use )</span>
-                                }
-
-                                <span className={'actions'}>
-                                    <button type={'button'}
-                                            onClick={() => this.handleEditEntity(entity)}
-                                            className={'edit'} >
-                                        <i className={'fa fa-pencil'} />
-                                    </button>
-
-                                    {!inUse &&
-                                        <button type={'button'}
-                                                onClick={() => this.handleRemoveEntity(entity)}
-                                                className={'remove'}>
-                                            <i className={'fa fa-times'} />
-                                        </button>
-                                    }
-                                </span>
-                            </li>
-                        );
-                    })
-                }
-                </ul>
-                <button type={'button'}
-                        onClick={() => this.handleCreateEntity()}
-                        className={'create'} >
-                    <i className={'fa fa-plus'} />
-                    <span>Create new entity</span>
-                </button>
-            </div>
-
+            <EntityList entities={entities} handleCreateEntity={this.handleCreateEntity} handleEditEntity={this.handleEditEntity} handleRemoveEntity={this.handleRemoveEntity} />
         )
     }
 

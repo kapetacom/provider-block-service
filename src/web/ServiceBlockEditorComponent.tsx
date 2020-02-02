@@ -71,9 +71,13 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                 
             },type:BlockType.SERVICE
         };
+
+        if (!this.spec.entities) {
+            this.spec.entities = [];
+        }
     }
     
-    private stateChanged() {
+    private invokeDataChanged() {
         this.props.onDataChanged(toJS(this.metadata), toJS(this.spec));
     }
 
@@ -81,14 +85,14 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private handleTargetConfigurationChange(config:Object) {
         this.spec.target.options = config;
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
     @action
     private handleMetaDataChanged(evt:ChangeEvent<HTMLInputElement>) {
-        this.metadata[evt.target.name] = evt.target.value.trim();
+        this.metadata[evt.target.name] = evt.target.value;
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
     @action
@@ -100,7 +104,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         this.spec.target.kind = kind;
         this.spec.target.options = {};
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
 
@@ -143,8 +147,9 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             return;
         }
 
-
         _.pull(this.spec.entities, entity);
+
+        this.invokeDataChanged();
     }
 
     @action
@@ -177,6 +182,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             //Creating entity
             this.spec.entities.push(this.originalEntity);
         }
+
+        this.invokeDataChanged();
 
         this.sidePanel && this.sidePanel.close();
     };

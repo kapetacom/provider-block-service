@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useState} from 'react';
 import {BlockMetadata, BlockServiceSpec, BlockType, SchemaKind, TargetConfig} from '@blockware/ui-web-types';
 import {BlockTargetProvider} from '@blockware/ui-web-context';
 import ServiceBlockEditorComponent from '../src/web/ServiceBlockEditorComponent';
@@ -35,4 +35,17 @@ export default {
   title: 'Service Block'
 };
 
-export const Editor = () => <ServiceBlockEditorComponent {...ServiceBlock} />;
+export const Editor = () => {
+
+  const [definition, setDefinition] = useState(ServiceBlock);
+
+  return (
+      <ServiceBlockEditorComponent {...definition} onDataChanged={((metadata, spec) => {
+        setDefinition({
+          kind: ServiceBlock.kind,
+          metadata,
+          spec
+        })
+      })} />
+  )
+};

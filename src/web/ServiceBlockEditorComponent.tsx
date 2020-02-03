@@ -72,9 +72,13 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                 
             },type:BlockType.SERVICE
         };
+
+        if (!this.spec.entities) {
+            this.spec.entities = [];
+        }
     }
     
-    private stateChanged() {
+    private invokeDataChanged() {
         this.props.onDataChanged(toJS(this.metadata), toJS(this.spec));
     }
 
@@ -82,14 +86,14 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private handleTargetConfigurationChange(config:Object) {
         this.spec.target.options = config;
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
     @action
     private handleMetaDataChanged(evt:ChangeEvent<HTMLInputElement>) {
-        this.metadata[evt.target.name] = evt.target.value.trim();
+        this.metadata[evt.target.name] = evt.target.value;
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
     @action
@@ -101,7 +105,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         this.spec.target.kind = kind;
         this.spec.target.options = {};
 
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
 
@@ -144,12 +148,9 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             return;
         }
 
-        let tempList = _.clone(this.spec.entities);    
-        _.pull(tempList, entity);
+        _.pull(this.spec.entities, entity);
 
-        this.spec.entities = tempList;
-
-        this.stateChanged();
+        this.invokeDataChanged();
     }
 
     @action
@@ -190,9 +191,9 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             this.spec.entities[ix] = this.currentEntity.getData();
         }
 
-        this.sidePanel && this.sidePanel.close();
+        this.invokeDataChanged();
 
-        this.stateChanged();
+        this.sidePanel && this.sidePanel.close();
     };
 
     private renderTargetConfig() {

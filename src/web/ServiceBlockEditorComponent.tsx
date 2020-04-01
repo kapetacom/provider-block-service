@@ -103,18 +103,18 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     @action
     createDropdownOptions() {
-        let options =new Map();
-        this.blockTargetKinds().forEach((targetConfig) => options.set(targetConfig.name, targetConfig.kind ));
+        let options : { [key: string]: string } = {};
+        this.blockTargetKinds().forEach((targetConfig) => options[targetConfig.kind]= targetConfig.name );
         return options;
     }
 
     @action
-    private handleTargetKindChanged(kind:string[]) {
-        if (this.spec.target.kind === kind[0]) {
+    private handleTargetKindChanged(kind:string) {
+        if (this.spec.target.kind === kind) {
             return;
         }
 
-        this.spec.target.kind = kind[0];
+        this.spec.target.kind = kind;
         this.spec.target.options = {};
 
         this.invokeDataChanged();
@@ -257,7 +257,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
                 <DropdownInput
                     name={"targetKind"}
-                    value={this.spec.target.kind.toLowerCase()}
+                    value={this.blockTargetKinds()[0].name}
                     label={"Target"}
                     validation={['required']}
                     help={"This tells the code generation process which target programming language to use."}

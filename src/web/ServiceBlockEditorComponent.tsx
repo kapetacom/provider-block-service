@@ -53,10 +53,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     sidePanel: SidePanel | null = null;
 
-    @observable
-    blockTargetKind: string= this.blockTargetKinds()[0].kind.toLowerCase();
-
-
     constructor(props:EntityConfigProps){
         super(props);
 
@@ -68,7 +64,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
         this.spec = !_.isEmpty(this.props.spec) ? _.cloneDeep(this.props.spec) : {
             target: {
-                kind: this.blockTargetKinds()[0].kind.toLowerCase(),
+                kind: '',
                 options: {},
                 
             },type:BlockType.SERVICE
@@ -77,10 +73,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         if (!this.spec.entities) {
             this.spec.entities = [];
         }
-    }
-    
-    private blockTargetKinds() {
-        return BlockTargetProvider.list(this.props.kind);
     }
     
     private invokeDataChanged() {
@@ -104,7 +96,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     @action
     private createDropdownOptions() {
         let options : { [key: string]: string } = {};
-        this.blockTargetKinds().forEach((targetConfig) => options[targetConfig.kind.toLowerCase()]= targetConfig.name );
+        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()]= targetConfig.name );
         return options;
     }
 
@@ -113,7 +105,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         if (this.spec.target.kind === value) {
             return;
         }
-        this.blockTargetKind=value        
 
         this.spec.target.kind = value;
         this.spec.target.options = {};
@@ -258,7 +249,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
                 <DropdownInput
                     name={"targetKind"}
-                    value={this.blockTargetKind}
+                    value={this.spec.target.kind.toLowerCase()}
                     label={"Target"}
                     validation={['required']}
                     help={"This tells the code generation process which target programming language to use."}

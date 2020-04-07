@@ -27,7 +27,7 @@
     "@babel/preset-env": "^7.5.0",
     "@babel/preset-react": "^7.7.4",
     "@babel/preset-typescript": "^7.3.3",
-    "@blockware/ui-web-components": "0.0.19",
+    "@blockware/ui-web-components": "^0.0.22",
     "@blockware/ui-web-context": "0.0.10",
     "@blockware/ui-web-types": "0.0.10",
     "@blockware/ui-web-utils": "0.0.6",

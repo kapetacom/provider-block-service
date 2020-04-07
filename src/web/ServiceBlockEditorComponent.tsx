@@ -1,4 +1,4 @@
-import React, {ChangeEvent, Component} from "react";
+import React, {Component} from "react";
 import _ from "lodash";
 import {action, observable, toJS} from "mobx";
 import {observer} from "mobx-react";
@@ -13,10 +13,6 @@ import {
     hasEntityReference,
     SchemaEntity
 } from "@blockware/ui-web-types";
-
-import {
-    toClass,
-} from "@blockware/ui-web-utils";
 
 import {
     TabContainer,
@@ -57,6 +53,10 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     sidePanel: SidePanel | null = null;
 
+    @observable
+    blockTargetKind: string= this.blockTargetKinds()[0].kind.toLowerCase();
+
+
     constructor(props:EntityConfigProps){
         super(props);
 
@@ -68,7 +68,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
         this.spec = !_.isEmpty(this.props.spec) ? _.cloneDeep(this.props.spec) : {
             target: {
-                kind: '',
+                kind: this.blockTargetKinds()[0].kind.toLowerCase(),
                 options: {},
                 
             },type:BlockType.SERVICE
@@ -102,19 +102,20 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     @action
-    createDropdownOptions() {
+    private createDropdownOptions() {
         let options : { [key: string]: string } = {};
-        this.blockTargetKinds().forEach((targetConfig) => options[targetConfig.kind]= targetConfig.name );
+        this.blockTargetKinds().forEach((targetConfig) => options[targetConfig.kind.toLowerCase()]= targetConfig.name );
         return options;
     }
 
     @action
-    private handleTargetKindChanged(kind:string) {
-        if (this.spec.target.kind === kind) {
+    private handleTargetKindChanged = (name:string,value:string) => {
+        if (this.spec.target.kind === value) {
             return;
         }
+        this.blockTargetKind=value        
 
-        this.spec.target.kind = kind;
+        this.spec.target.kind = value;
         this.spec.target.options = {};
 
         this.invokeDataChanged();
@@ -257,11 +258,11 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
                 <DropdownInput
                     name={"targetKind"}
-                    value={this.blockTargetKinds()[0].name}
+                    value={this.blockTargetKind}
                     label={"Target"}
                     validation={['required']}
                     help={"This tells the code generation process which target programming language to use."}
-                    onChange={(inputName:string, userInput:string[])=>this.handleTargetKindChanged(userInput)}
+                    onChange={this.handleTargetKindChanged}
                     options={this.createDropdownOptions()}
                     >
                 </DropdownInput>

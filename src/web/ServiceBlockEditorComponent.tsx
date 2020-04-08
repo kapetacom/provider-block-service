@@ -1,4 +1,4 @@
-import React, {ChangeEvent, Component} from "react";
+import React, {Component} from "react";
 import _ from "lodash";
 import {action, observable, toJS} from "mobx";
 import {observer} from "mobx-react";
@@ -15,11 +15,6 @@ import {
 } from "@blockware/ui-web-types";
 
 import {
-    toClass,
-} from "@blockware/ui-web-utils";
-
-import {
-    FormRow,
     TabContainer,
     TabPage,
     SidePanel,
@@ -29,7 +24,9 @@ import {
     EntityList,
     EntityFormModel,
     FormButtons,
-    FormContainer
+    FormContainer,
+    DropdownInput,
+    SingleLineInput
 } from "@blockware/ui-web-components";
 
 import {
@@ -90,19 +87,26 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     @action
-    private handleMetaDataChanged(evt:ChangeEvent<HTMLInputElement>) {
-        this.metadata[evt.target.name] = evt.target.value;
+    private handleMetaDataChanged(inputName: string, userInput: string) {
+        this.metadata[inputName] = userInput;
 
         this.invokeDataChanged();
     }
 
     @action
-    private handleTargetKindChanged(kind:string) {
-        if (this.spec.target.kind === kind) {
+    private createDropdownOptions() {
+        let options : { [key: string]: string } = {};
+        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()]= targetConfig.name );
+        return options;
+    }
+
+    @action
+    private handleTargetKindChanged = (name:string,value:string) => {
+        if (this.spec.target.kind === value) {
             return;
         }
 
-        this.spec.target.kind = kind;
+        this.spec.target.kind = value;
         this.spec.target.options = {};
 
         this.invokeDataChanged();
@@ -212,7 +216,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
         return (
             <div className="form-section">
-                <h3>Target configuration</h3>
+                <span>Target configuration</span>
                 <TargetConfigComponent
                     value={this.spec.target.options ? toJS(this.spec.target.options) : {}}
                     onOptionsChanged={(config:Object) => { this.handleTargetConfigurationChange(config) }} />
@@ -223,38 +227,37 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private renderForm() {
         return (
             <>
-                <FormRow label="Name"
-                         help="Specifiy the name of your block."
-                         validation={'required'}>
-                    <input type="text" placeholder="E.g. My Block Name"
-                           name="name"
-                           autoComplete={"off"}
-                           value={this.metadata.name}
-                           onChange={(evt) => {this.handleMetaDataChanged(evt)}} />
-                </FormRow>
 
-                <FormRow label={"Version"}
-                         help="The version is automatically calculated for you using semantic versioning."
-                         validation={'required'}>
-                    <input type="text" disabled
-                           name="version"
-                           value={this.metadata.version}
-                           onChange={(evt) => {this.handleMetaDataChanged(evt)}} />
-                </FormRow>
+                <SingleLineInput
+                    name={"name"}
+                    value={this.metadata.name}
+                    label={"Name"}
+                    validation={['required']}
+                    help={"Specify the name of your block."}
+                    onChange={(inputName, userInput)=>this.handleMetaDataChanged(inputName,userInput)} >                    
+                </SingleLineInput>
 
-                <FormRow label={"Target"}
-                         help="This tells the code generation process which target programming language to use."
-                         validation={'required'}>
-                    <select name="targetKind"
-                            value={this.spec.target.kind.toLowerCase()}
-                            onChange={(evt) => {this.handleTargetKindChanged(evt.target.value)}}>
+                <SingleLineInput
+                    name={"version"}
+                    value={this.metadata.version}
+                    label={"Version"}
+                    validation={['required']}
+                    help={"The version is automatically calculated for you using semantic versioning."}
+                    disabled={true}
+                    onChange={(inputName, userInput)=>this.handleMetaDataChanged(inputName,userInput)} >                    
+                </SingleLineInput>
 
-                        <option value="">Select target...</option>
-                        {BlockTargetProvider.list(this.props.kind).map((targetConfig, ix) => {
-                            return <option key={ix} value={targetConfig.kind.toLowerCase()}>{targetConfig.name}</option>
-                        })}
-                    </select>
-                </FormRow>
+                <DropdownInput
+                    name={"targetKind"}
+                    value={this.spec.target.kind.toLowerCase()}
+                    label={"Target"}
+                    validation={['required']}
+                    help={"This tells the code generation process which target programming language to use."}
+                    onChange={this.handleTargetKindChanged}
+                    options={this.createDropdownOptions()}
+                    >
+                </DropdownInput>
+
 
                 {this.renderTargetConfig()}
             </>

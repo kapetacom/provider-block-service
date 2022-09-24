@@ -23,20 +23,25 @@ module.exports = {
                         "@babel/react"
                     ],
                     plugins: [
-                        ["@babel/plugin-proposal-decorators", {legacy: true} ],
-                        ["@babel/plugin-proposal-class-properties", { loose: true }],
+                        ["@babel/plugin-proposal-decorators", {legacy: true}],
+                        ["@babel/plugin-proposal-private-methods", { "loose": true }],
+                        ["@babel/plugin-proposal-private-property-in-object", {"loose": true}],
+
+                        [
+                            "@babel/plugin-proposal-class-properties", {loose: true}
+                        ],
                         "@babel/proposal-object-rest-spread"
                     ]
                 }
             },
             {
                 test: /\.less$/,
-                loaders: ["style-loader", "css-loader", "less-loader"],
+                use: ["style-loader", "css-loader", "less-loader"],
                 include: Path.resolve(__dirname, "./")
             },
             {
                 test: /\.ya?ml$/,
-                loaders: ['json-loader', 'yaml-loader'],
+                use: ['json-loader', 'yaml-loader'],
                 include: Path.resolve(__dirname, "./")
             }
         ]

@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import _ from "lodash";
-import {action, observable, toJS} from "mobx";
+import {action, makeObservable, observable, toJS} from "mobx";
 import {observer} from "mobx-react";
 
 import {
@@ -26,7 +26,8 @@ import {
     FormButtons,
     FormContainer,
     DropdownInput,
-    SingleLineInput
+    SingleLineInput,
+    Button, ButtonType, ButtonStyle
 } from "@blockware/ui-web-components";
 
 import {
@@ -38,23 +39,24 @@ import './ServiceBlockEditorComponent.less';
 
 @observer
 class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, BlockServiceSpec>, any> {
-    
-    @observable
-    private readonly metadata:BlockMetadata;
 
     @observable
-    private readonly spec:BlockServiceSpec;
+    private readonly metadata: BlockMetadata;
 
     @observable
-    private currentEntity?:EntityFormModel;
+    private readonly spec: BlockServiceSpec;
 
     @observable
-    private originalEntity?:SchemaEntity;
+    private currentEntity?: EntityFormModel;
+
+    @observable
+    private originalEntity?: SchemaEntity;
 
     sidePanel: SidePanel | null = null;
 
-    constructor(props:EntityConfigProps){
+    constructor(props: EntityConfigProps) {
         super(props);
+        makeObservable(this);
 
         this.metadata = !_.isEmpty(this.props.metadata) ? _.cloneDeep(this.props.metadata) : {
             name: '',
@@ -66,21 +68,21 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
             target: {
                 kind: '',
                 options: {},
-                
-            },type:BlockType.SERVICE
+
+            }, type: BlockType.SERVICE
         };
 
         if (!this.spec.entities) {
             this.spec.entities = [];
         }
     }
-    
+
     private invokeDataChanged() {
         this.props.onDataChanged(toJS(this.metadata), toJS(this.spec));
     }
 
     @action
-    private handleTargetConfigurationChange(config:Object) {
+    private handleTargetConfigurationChange(config: Object) {
         this.spec.target.options = config;
 
         this.invokeDataChanged();
@@ -95,13 +97,13 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     @action
     private createDropdownOptions() {
-        let options : { [key: string]: string } = {};
-        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()]= targetConfig.name );
+        let options: { [key: string]: string } = {};
+        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()] = targetConfig.name);
         return options;
     }
 
     @action
-    private handleTargetKindChanged = (name:string,value:string) => {
+    private handleTargetKindChanged = (name: string, value: string) => {
         if (this.spec.target.kind === value) {
             return;
         }
@@ -120,12 +122,12 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     };
 
     @action
-    private handleEditEntity = (entity:SchemaEntity) => {
+    private handleEditEntity = (entity: SchemaEntity) => {
         if (!this.sidePanel) {
             return;
         }
 
-        this.currentEntity = new EntityFormModel(entity);
+        this.currentEntity = makeObservable(new EntityFormModel(entity));
         this.originalEntity = entity;
         this.sidePanel.open();
     }
@@ -135,13 +137,13 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         if (!this.sidePanel) {
             return;
         }
-        this.currentEntity = new EntityFormModel();
+        this.currentEntity = makeObservable(new EntityFormModel());
         this.originalEntity = this.currentEntity.getData();
         this.sidePanel.open();
     }
 
     @action
-    private handleRemoveEntity = (entity:SchemaEntity) => {
+    private handleRemoveEntity = (entity: SchemaEntity) => {
         if (!this.spec.entities) {
             return;
         }
@@ -158,17 +160,17 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     @action
-    private handleEntityUpdated = (entity:EntityFormModel) => {
+    private handleEntityUpdated = (entity: EntityFormModel) => {
         this.currentEntity = entity;
     };
 
     @action
-    private handleEntitySaved = () => {       
+    private handleEntitySaved = () => {
         //this.spec.entities is set to an empty array in case it`s undefined, otherwise the function will exit in the next Return.
-        if(!this.spec.entities){
+        if (!this.spec.entities) {
             this.spec.entities = [];
         }
-        
+
         if (!this.currentEntity ||
             !this.originalEntity ||
             !this.spec.entities) {
@@ -219,7 +221,9 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                 <span>Target configuration</span>
                 <TargetConfigComponent
                     value={this.spec.target.options ? toJS(this.spec.target.options) : {}}
-                    onOptionsChanged={(config:Object) => { this.handleTargetConfigurationChange(config) }} />
+                    onOptionsChanged={(config: Object) => {
+                        this.handleTargetConfigurationChange(config)
+                    }}/>
             </div>
         );
     }
@@ -234,7 +238,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     label={"Name"}
                     validation={['required']}
                     help={"Specify the name of your block."}
-                    onChange={(inputName, userInput)=>this.handleMetaDataChanged(inputName,userInput)} >                    
+                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)}>
                 </SingleLineInput>
 
                 <SingleLineInput
@@ -244,7 +248,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     validation={['required']}
                     help={"The version is automatically calculated for you using semantic versioning."}
                     disabled={true}
-                    onChange={(inputName, userInput)=>this.handleMetaDataChanged(inputName,userInput)} >                    
+                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)}>
                 </SingleLineInput>
 
                 <DropdownInput
@@ -255,9 +259,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     help={"This tells the code generation process which target programming language to use."}
                     onChange={this.handleTargetKindChanged}
                     options={this.createDropdownOptions()}
-                    >
+                >
                 </DropdownInput>
-
 
                 {this.renderTargetConfig()}
             </>
@@ -267,7 +270,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private renderEntities() {
         const entities = this.spec.entities || [];
         return (
-            <EntityList entities={entities} handleCreateEntity={this.handleCreateEntity} handleEditEntity={this.handleEditEntity} handleRemoveEntity={this.handleRemoveEntity} />
+            <EntityList entities={entities} handleCreateEntity={this.handleCreateEntity}
+                        handleEditEntity={this.handleEditEntity} handleRemoveEntity={this.handleRemoveEntity}/>
         )
     }
 
@@ -293,22 +297,20 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                            side={PanelAlignment.right}
                            onClose={this.handleEntityFormClosed}
                            title={'Edit entity'}>
-                    <FormContainer onSubmit={this.handleEntitySaved}>
-                        {this.currentEntity &&
+                    {this.currentEntity &&
+                        <FormContainer onSubmit={this.handleEntitySaved}>
+
                             <EntityForm name={'block-entity'}
                                         entity={this.currentEntity}
-                                        onChange={this.handleEntityUpdated}/>
-                        }
+                                        onChange={this.handleEntityUpdated} />
 
-                        <FormButtons>
-                            <button type={'button'} className={'cancel'} onClick={() => {this.sidePanel && this.sidePanel.close()}}>
-                                Cancel
-                            </button>
-                            <button type={'submit'} className={'action primary'}>
-                                Save
-                            </button>
-                        </FormButtons>
-                    </FormContainer>
+                               <FormButtons>
+                                <Button width={70} type={ButtonType.BUTTON} style={ButtonStyle.DANGER}
+                                        onClick={() => this.sidePanel && this.sidePanel.close()} text="Cancel"/>
+                                <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save"/>
+                            </FormButtons>
+                        </FormContainer>
+                    }
                 </SidePanel>
             </div>
         )

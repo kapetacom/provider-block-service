@@ -10,24 +10,18 @@ import {
     BlockType,
     TargetConfigProps,
     EntityConfigProps,
-    hasEntityReference,
-    SchemaEntity
+    SchemaProperties
 } from "@blockware/ui-web-types";
 
 import {
     TabContainer,
     TabPage,
-    SidePanel,
-    PanelAlignment,
-    PanelSize,
-    EntityForm,
-    EntityList,
-    EntityFormModel,
-    FormButtons,
-    FormContainer,
     DropdownInput,
     SingleLineInput,
-    Button, ButtonType, ButtonStyle
+    DataTypeEditor,
+    DSLEntityType,
+    DSLDataType,
+    DSLDataTypeProperty
 } from "@blockware/ui-web-components";
 
 import {
@@ -37,6 +31,62 @@ import {
 
 import './ServiceBlockEditorComponent.less';
 
+
+function fromSchema(properties:SchemaProperties):DSLDataTypeProperty[] {
+    return Object.entries(properties).map(([name, value]):DSLDataTypeProperty => {
+        // @ts-ignore
+        const stringType = value.type && value.type.$ref ? value.type.$ref : value.type
+
+        if (stringType === 'array') {
+            return {
+                name,
+                type: value.items?.type,
+                list: true,
+                properties: value.items?.properties ? fromSchema(value.items?.properties) : null
+            }
+        }
+
+        return {
+            name,
+            type: stringType,
+            list: stringType.endsWith('[]'),
+            properties: value.properties ? fromSchema(value.properties) : null
+        }
+    });
+}
+
+function toSchema(properties:DSLDataTypeProperty[]):SchemaProperties {
+    const out = {};
+
+    properties.forEach(property => {
+
+        let type = property.type;
+        if (property.type.substring(0,1).toUpperCase() === property.type.substring(0,1)) {
+            //Poor mans check if built in type.
+            //TODO: Fix - either by not having $ref or by returning it explicitly
+            type = {$ref: type}
+        }
+
+        if (property.list) {
+            out[property.name] = {
+                type: 'array',
+                items: {
+                    type,
+                    properties: property.properties ? toSchema(property.properties) : null
+                }
+            }
+        } else {
+            out[property.name] = {
+                type,
+                properties: property.properties ? toSchema(property.properties) : null
+            }
+        }
+
+    })
+
+    return out;
+}
+
 @observer
 class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, BlockServiceSpec>, any> {
 
@@ -45,14 +95,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     @observable
     private readonly spec: BlockServiceSpec;
-
-    @observable
-    private currentEntity?: EntityFormModel;
-
-    @observable
-    private originalEntity?: SchemaEntity;
-
-    sidePanel: SidePanel | null = null;
 
     constructor(props: EntityConfigProps) {
         super(props);
@@ -114,93 +156,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         this.invokeDataChanged();
     }
 
-
-    @action
-    private handleEntityFormClosed = () => {
-        this.currentEntity = undefined;
-        this.originalEntity = undefined;
-    };
-
-    @action
-    private handleEditEntity = (entity: SchemaEntity) => {
-        if (!this.sidePanel) {
-            return;
-        }
-
-        this.currentEntity = makeObservable(new EntityFormModel(entity));
-        this.originalEntity = entity;
-        this.sidePanel.open();
-    }
-
-    @action
-    private handleCreateEntity = () => {
-        if (!this.sidePanel) {
-            return;
-        }
-        this.currentEntity = makeObservable(new EntityFormModel());
-        this.originalEntity = this.currentEntity.getData();
-        this.sidePanel.open();
-    }
-
-    @action
-    private handleRemoveEntity = (entity: SchemaEntity) => {
-        if (!this.spec.entities) {
-            return;
-        }
-
-        //Check if entity is being used by any of the resources
-        if (hasEntityReference(this.spec, entity.name)) {
-            //If it is - prevent deletion. The user must remove the usages first
-            return;
-        }
-
-        _.pull(this.spec.entities, entity);
-
-        this.invokeDataChanged();
-    }
-
-    @action
-    private handleEntityUpdated = (entity: EntityFormModel) => {
-        this.currentEntity = entity;
-    };
-
-    @action
-    private handleEntitySaved = () => {
-        //this.spec.entities is set to an empty array in case it`s undefined, otherwise the function will exit in the next Return.
-        if (!this.spec.entities) {
-            this.spec.entities = [];
-        }
-
-        if (!this.currentEntity ||
-            !this.originalEntity ||
-            !this.spec.entities) {
-            return;
-        }
-
-        const otherEntity = _.find(this.spec.entities, (entity) => {
-            return (entity !== this.originalEntity &&
-                this.currentEntity &&
-                this.currentEntity.name === entity.name);
-        });
-
-        if (otherEntity) {
-            //Other entity with same name exists - invalid;
-            return;
-        }
-
-        const ix = this.spec.entities.indexOf(this.originalEntity);
-
-        if (ix === -1) {
-            //Creating entity
-            this.spec.entities.push(this.currentEntity.getData());
-        } else {
-            this.spec.entities[ix] = this.currentEntity.getData();
-        }
-
-        this.invokeDataChanged();
-
-        this.sidePanel && this.sidePanel.close();
-    };
 
     private renderTargetConfig() {
         let TargetConfigComponent: Type<Component<TargetConfigProps, any>> | null = null;
@@ -269,10 +224,40 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
     private renderEntities() {
         const entities = this.spec.entities || [];
+
+        const result = {
+            code: '',
+            entities: entities.map((entity):DSLDataType => {
+                return {
+                    type: DSLEntityType.DATATYPE,
+                    name: entity.name,
+                    properties: fromSchema(entity.properties)
+                }
+            })
+        };
+
         return (
-            <EntityList entities={entities} handleCreateEntity={this.handleCreateEntity}
-                        handleEditEntity={this.handleEditEntity} handleRemoveEntity={this.handleRemoveEntity}/>
+            <div className={'entity-editor'}>
+                <DataTypeEditor value={result} onChange={(result) => {
+                    result.entities && this.setEntities(result.entities);
+                }} />
+            </div>
         )
+    }
+
+    @action
+    private setEntities(results: DSLDataType[]) {
+        const newEntities = results.map((entity:DSLDataType) => {
+            return {
+                name: entity.name,
+                properties: toSchema(entity.properties)
+            }
+        });
+
+        if (!_.isEqual(this.spec.entities, newEntities)) {
+            this.spec.entities = newEntities
+            this.invokeDataChanged();
+        }
     }
 
     render() {
@@ -292,26 +277,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
                 </TabContainer>
 
-                <SidePanel size={PanelSize.small}
-                           ref={(ref) => this.sidePanel = ref}
-                           side={PanelAlignment.right}
-                           onClose={this.handleEntityFormClosed}
-                           title={'Edit entity'}>
-                    {this.currentEntity &&
-                        <FormContainer onSubmit={this.handleEntitySaved}>
-
-                            <EntityForm name={'block-entity'}
-                                        entity={this.currentEntity}
-                                        onChange={this.handleEntityUpdated} />
-
-                               <FormButtons>
-                                <Button width={70} type={ButtonType.BUTTON} style={ButtonStyle.DANGER}
-                                        onClick={() => this.sidePanel && this.sidePanel.close()} text="Cancel"/>
-                                <Button width={70} type={ButtonType.SUBMIT} style={ButtonStyle.PRIMARY} text="Save"/>
-                            </FormButtons>
-                        </FormContainer>
-                    }
-                </SidePanel>
             </div>
         )
     }

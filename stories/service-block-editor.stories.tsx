@@ -26,33 +26,39 @@ const ServiceBlock: SchemaKind<BlockServiceSpec, BlockMetadata> = {
         target: {
             kind: targetConfig.kind
         },
-        entities: [
-            {
-                name: 'MyEntity',
-                properties: {
-                    'id': {
-                        type: 'string'
-                    },
-                    'tags': {
-                        type: 'array',
-                        items: {
+        entities: {
+            source: {
+                type: 'blockware-dsl',
+                value: ''
+            },
+            types: [
+                {
+                    name: 'MyEntity',
+                    properties: {
+                        'id': {
                             type: 'string'
-                        }
-                    },
-                    'children': {
-                        type: 'array',
-                        items: {
-                            type: 'object',
-                            properties: {
-                                childId: {
-                                    type: 'integer'
+                        },
+                        'tags': {
+                            type: 'array',
+                            items: {
+                                type: 'string'
+                            }
+                        },
+                        'children': {
+                            type: 'array',
+                            items: {
+                                type: 'object',
+                                properties: {
+                                    childId: {
+                                        type: 'integer'
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-        ]
+            ]
+        }
     }
 };
 

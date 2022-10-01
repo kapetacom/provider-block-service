@@ -3,14 +3,16 @@ import _ from "lodash";
 import {action, makeObservable, observable, toJS} from "mobx";
 import {observer} from "mobx-react";
 
-import {
+import type {
     Type,
     BlockMetadata,
     BlockServiceSpec,
-    BlockType,
     TargetConfigProps,
-    EntityConfigProps,
-    SchemaProperties
+    EntityConfigProps
+} from "@blockware/ui-web-types";
+
+import {
+    BlockType
 } from "@blockware/ui-web-types";
 
 import {
@@ -21,7 +23,9 @@ import {
     DataTypeEditor,
     DSLEntityType,
     DSLDataType,
-    DSLDataTypeProperty
+    DSLDataTypeProperty,
+    DSLConverters,
+    DSL_LANGUAGE_ID
 } from "@blockware/ui-web-components";
 
 import {
@@ -32,60 +36,6 @@ import {
 import './ServiceBlockEditorComponent.less';
 
 
-function fromSchema(properties:SchemaProperties):DSLDataTypeProperty[] {
-    return Object.entries(properties).map(([name, value]):DSLDataTypeProperty => {
-        // @ts-ignore
-        const stringType = value.type && value.type.$ref ? value.type.$ref : value.type
-
-        if (stringType === 'array') {
-            return {
-                name,
-                type: value.items?.type,
-                list: true,
-                properties: value.items?.properties ? fromSchema(value.items?.properties) : null
-            }
-        }
-
-        return {
-            name,
-            type: stringType,
-            list: stringType.endsWith('[]'),
-            properties: value.properties ? fromSchema(value.properties) : null
-        }
-    });
-}
-
-function toSchema(properties:DSLDataTypeProperty[]):SchemaProperties {
-    const out = {};
-
-    properties.forEach(property => {
-
-        let type = property.type;
-        if (property.type.substring(0,1).toUpperCase() === property.type.substring(0,1)) {
-            //Poor mans check if built in type.
-            //TODO: Fix - either by not having $ref or by returning it explicitly
-            type = {$ref: type}
-        }
-
-        if (property.list) {
-            out[property.name] = {
-                type: 'array',
-                items: {
-                    type,
-                    properties: property.properties ? toSchema(property.properties) : null
-                }
-            }
-        } else {
-            out[property.name] = {
-                type,
-                properties: property.properties ? toSchema(property.properties) : null
-            }
-        }
-
-    })
-
-    return out;
-}
 
 @observer
 class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, BlockServiceSpec>, any> {
@@ -115,7 +65,13 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         };
 
         if (!this.spec.entities) {
-            this.spec.entities = [];
+            this.spec.entities = {
+                types: [],
+                source: {
+                    type: DSL_LANGUAGE_ID,
+                    value: ''
+                }
+            };
         }
     }
 
@@ -193,8 +149,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     label={"Name"}
                     validation={['required']}
                     help={"Specify the name of your block."}
-                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)}>
-                </SingleLineInput>
+                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)} />
 
                 <SingleLineInput
                     name={"version"}
@@ -203,8 +158,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     validation={['required']}
                     help={"The version is automatically calculated for you using semantic versioning."}
                     disabled={true}
-                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)}>
-                </SingleLineInput>
+                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)} />
 
                 <DropdownInput
                     name={"targetKind"}
@@ -214,8 +168,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                     help={"This tells the code generation process which target programming language to use."}
                     onChange={this.handleTargetKindChanged}
                     options={this.createDropdownOptions()}
-                >
-                </DropdownInput>
+                />
 
                 {this.renderTargetConfig()}
             </>
@@ -223,41 +176,33 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     }
 
     private renderEntities() {
-        const entities = this.spec.entities || [];
+        const entities = this.spec.entities;
 
         const result = {
-            code: '',
-            entities: entities.map((entity):DSLDataType => {
-                return {
-                    type: DSLEntityType.DATATYPE,
-                    name: entity.name,
-                    properties: fromSchema(entity.properties)
-                }
-            })
+            code: entities?.source?.value || '',
+            entities: entities?.types?.map ? entities?.types?.map(DSLConverters.fromSchemaEntity) : []
         };
 
         return (
             <div className={'entity-editor'}>
                 <DataTypeEditor value={result} onChange={(result) => {
-                    result.entities && this.setEntities(result.entities);
+                    result.entities && this.setEntities(result.code, result.entities as DSLDataType[]);
                 }} />
             </div>
         )
     }
 
     @action
-    private setEntities(results: DSLDataType[]) {
-        const newEntities = results.map((entity:DSLDataType) => {
-            return {
-                name: entity.name,
-                properties: toSchema(entity.properties)
+    private setEntities(code:string, results: DSLDataType[]) {
+        const types = results.map(DSLConverters.toSchemaEntity);
+        this.spec.entities = {
+            types,
+            source: {
+                type: DSL_LANGUAGE_ID,
+                value: code
             }
-        });
-
-        if (!_.isEqual(this.spec.entities, newEntities)) {
-            this.spec.entities = newEntities
-            this.invokeDataChanged();
-        }
+        };
+        this.invokeDataChanged();
     }
 
     render() {

@@ -21,9 +21,7 @@ import {
     DropdownInput,
     SingleLineInput,
     DataTypeEditor,
-    DSLEntityType,
     DSLDataType,
-    DSLDataTypeProperty,
     DSLConverters,
     DSL_LANGUAGE_ID
 } from "@blockware/ui-web-components";

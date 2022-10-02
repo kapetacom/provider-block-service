@@ -2,10 +2,30 @@
 @import "~@blockware/ui-web-components/styles/functions";
 
 .service-block-config {
+    height: 100%;
+    width: 100%;
+    .tab-container,
+    .tab-page,
+    .entity-editor {
+        height: 100%;
+        width: 100%;
+        box-sizing: border-box;
+    }
 
     .entity-editor {
-        min-height: 500px;
-        height: 500px;
+        position: relative;
+    }
+
+    .tab-container {
+        display: flex;
+        flex-direction: column;
+        > .tab-buttons {
+            flex: 0;
+        }
+
+        > .tab-pages {
+            flex: 1;
+        }
     }
 
 }

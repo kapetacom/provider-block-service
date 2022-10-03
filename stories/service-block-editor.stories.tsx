@@ -1,5 +1,12 @@
 import React, {useState} from 'react';
-import {BlockMetadata, BlockServiceSpec, BlockType, SchemaKind, TargetConfig} from '@blockware/ui-web-types';
+import {
+    BlockMetadata,
+    BlockServiceSpec,
+    BlockType,
+    SchemaEntityType,
+    SchemaKind,
+    TargetConfig
+} from '@blockware/ui-web-types';
 import {BlockTargetProvider} from '@blockware/ui-web-context';
 import ServiceBlockEditorComponent from '../src/web/ServiceBlockEditorComponent';
 
@@ -33,6 +40,7 @@ const ServiceBlock: SchemaKind<BlockServiceSpec, BlockMetadata> = {
             },
             types: [
                 {
+                    type: SchemaEntityType.DTO,
                     name: 'MyEntity',
                     properties: {
                         'id': {
@@ -80,7 +88,8 @@ export const CreateEditor = () => {
                                              kind: ServiceBlock.kind,
                                              metadata,
                                              spec
-                                         })
+                                         });
+                                         console.log('Data changed', metadata, spec);
                                      })}/>
     )
 };
@@ -97,7 +106,9 @@ export const EditEditor = () => {
                 kind: ServiceBlock.kind,
                 metadata,
                 spec
-            })
+            });
+            console.log('Data changed', metadata, spec);
+
         })}/>
     )
 };

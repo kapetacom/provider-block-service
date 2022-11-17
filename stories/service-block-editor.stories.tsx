@@ -12,7 +12,7 @@ import ServiceBlockEditorComponent from '../src/web/ServiceBlockEditorComponent'
 
 import '@blockware/ui-web-components/styles/index.less';
 
-const BLOCK_KIND = 'blocks.blockware.com/v1/Service';
+const BLOCK_KIND = 'blockware/block-type-service';
 
 const targetConfig: TargetConfig = {
     kind: 'my-language-target',

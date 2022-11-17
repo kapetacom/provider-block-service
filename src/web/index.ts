@@ -4,8 +4,8 @@ import ServiceBlockValidation from './ServiceBlockValidation';
 const blockDefinition = require('../../blockware.yml');
 
 const blockType:BlockConfig = {
-    kind: blockDefinition.metadata.id,
-    name: blockDefinition.metadata.name,
+    kind: blockDefinition.metadata.name,
+    name: blockDefinition.metadata.title,
     validate: ServiceBlockValidation,
     componentType: ServiceBlockEditorComponent
 };

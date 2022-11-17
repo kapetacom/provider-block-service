@@ -50,7 +50,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
         this.metadata = !_.isEmpty(this.props.metadata) ? _.cloneDeep(this.props.metadata) : {
             name: '',
-            version: '0.0.1'
+            title: ''
         };
 
 
@@ -140,23 +140,6 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     private renderForm() {
         return (
             <>
-
-                <SingleLineInput
-                    name={"name"}
-                    value={this.metadata.name}
-                    label={"Name"}
-                    validation={['required']}
-                    help={"Specify the name of your block."}
-                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)} />
-
-                <SingleLineInput
-                    name={"version"}
-                    value={this.metadata.version}
-                    label={"Version"}
-                    validation={['required']}
-                    help={"The version is automatically calculated for you using semantic versioning."}
-                    disabled={true}
-                    onChange={(inputName, userInput) => this.handleMetaDataChanged(inputName, userInput)} />
 
                 <DropdownInput
                     name={"targetKind"}

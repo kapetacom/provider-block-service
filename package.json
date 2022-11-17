@@ -19,6 +19,12 @@
     "start": "npm run watch",
     "watch": "webpack --watch"
   },
+  "peerDependencies": {
+    "@blockware/ui-web-components": "<2",
+    "@blockware/ui-web-context": "<2",
+    "@blockware/ui-web-types": "<2",
+    "@blockware/ui-web-utils": "<2"
+  },
   "devDependencies": {
     "@blockware/ui-web-components": "<2",
     "@blockware/ui-web-context": "<2",

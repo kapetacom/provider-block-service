@@ -18,12 +18,10 @@ import {
 import {
     TabContainer,
     TabPage,
-    DropdownInput,
-    SingleLineInput,
     DataTypeEditor,
     DSLDataType,
     DSLConverters,
-    DSL_LANGUAGE_ID, DSLEntity
+    DSL_LANGUAGE_ID, DSLEntity, FormSelect
 } from "@blockware/ui-web-components";
 
 import {
@@ -94,7 +92,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     @action
     private createDropdownOptions() {
         let options: { [key: string]: string } = {};
-        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()] = targetConfig.name);
+        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()] = targetConfig.title || targetConfig.kind);
         return options;
     }
 
@@ -141,7 +139,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         return (
             <>
 
-                <DropdownInput
+                <FormSelect
                     name={"targetKind"}
                     value={this.spec.target.kind.toLowerCase()}
                     label={"Target"}

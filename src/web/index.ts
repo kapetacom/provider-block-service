@@ -5,7 +5,7 @@ const blockDefinition = require('../../blockware.yml');
 
 const blockType:BlockConfig = {
     kind: blockDefinition.metadata.name,
-    name: blockDefinition.metadata.title,
+    title: blockDefinition.metadata.title,
     validate: ServiceBlockValidation,
     componentType: ServiceBlockEditorComponent
 };

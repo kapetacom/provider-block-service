@@ -1,6 +1,6 @@
 {
   "name": "@blockware/provider-block-service",
-  "version": "0.0.17",
+  "version": "0.0.18",
   "main": "index.js",
   "description": "Provides block type for backend microservices",
   "keywords": [

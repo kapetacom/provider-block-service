@@ -8,7 +8,8 @@ import type {
     BlockMetadata,
     BlockServiceSpec,
     TargetConfigProps,
-    EntityConfigProps
+    EntityConfigProps,
+    TargetConfig
 } from "@blockware/ui-web-types";
 
 import {
@@ -42,6 +43,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     @observable
     private readonly spec: BlockServiceSpec;
 
+    private readonly originalTargetKind:string
+
     constructor(props: EntityConfigProps) {
         super(props);
         makeObservable(this);
@@ -59,6 +62,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
             }, type: BlockType.SERVICE
         };
+
+        this.originalTargetKind = this.spec.target.kind;
 
         if (!this.spec.entities) {
             this.spec.entities = {
@@ -92,7 +97,24 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
     @action
     private createDropdownOptions() {
         let options: { [key: string]: string } = {};
-        BlockTargetProvider.list(this.props.kind).forEach((targetConfig) => options[targetConfig.kind.toLowerCase()] = targetConfig.title || targetConfig.kind);
+        const addTarget = (targetConfig:TargetConfig) => {
+            const key = `${targetConfig.kind.toLowerCase()}:${targetConfig.version.toLowerCase()}`;
+            const title = targetConfig.title ?
+                `${targetConfig.title} [${targetConfig.kind.toLowerCase()}:${targetConfig.version}]` :
+                `${targetConfig.kind}:${targetConfig.version}`;
+            options[key] = title;
+        };
+        BlockTargetProvider.list(this.props.kind)
+            .forEach(addTarget);
+        if (this.originalTargetKind &&
+            !options[this.originalTargetKind]) {
+            //Always add the current target if not already added.
+            //This usually happens if block uses an older version
+            const currentTarget = BlockTargetProvider.get(this.originalTargetKind, this.props.kind);
+            if (currentTarget) {
+                addTarget(currentTarget);
+            }
+        }
         return options;
     }
 
@@ -141,7 +163,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
 
                 <FormSelect
                     name={"targetKind"}
-                    value={this.spec.target.kind.toLowerCase()}
+                    value={this.spec.target?.kind?.toLowerCase()}
                     label={"Target"}
                     validation={['required']}
                     help={"This tells the code generation process which target programming language to use."}

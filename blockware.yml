@@ -5,9 +5,12 @@ metadata:
 
 spec:
   dependencies:
-    - spec.consumers.kind
-    - spec.providers.kind
-    - spec.target.kind
+    - path: spec.consumers.kind
+      type: Consumers
+    - path: spec.providers.kind
+      type: Providers
+    - path: spec.target.kind
+      type: Language target
   schema:
     type: object
     properties:

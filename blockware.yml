@@ -4,6 +4,10 @@ metadata:
   title: Service
 
 spec:
+  dependencies:
+    - spec.consumers.kind
+    - spec.providers.kind
+    - spec.target.kind
   schema:
     type: object
     properties:

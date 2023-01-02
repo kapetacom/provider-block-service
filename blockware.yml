@@ -19,8 +19,8 @@ spec:
       entities:
         $ref: /core/entity-list
       consumers:
-        $ref: /core/resource-list
+        $ref: /core/block-resource-list
       providers:
-        $ref: /core/resource-list
+        $ref: /core/block-resource-list
     required:
       - target

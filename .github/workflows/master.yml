@@ -1,0 +1,47 @@
+name: Master build
+# trigger on push to master
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  relase:
+    name: Release
+    runs-on: ubuntu-latest
+    permissions:
+      contents: 'write'
+      id-token: 'write'
+      issues: 'write'
+      pull-requests: 'write'
+    steps:
+      - uses: actions/checkout@v3
+        id: checkout
+      - uses: actions/setup-node@v3
+        id: setup-node
+      - name: Install dependencies
+        run: npm install
+      - name: Build
+        run: npm run build
+      - name: checkout action
+        uses: actions/checkout@v3
+        with:
+          repository: blockwarecom/core-registry-action
+          path: ./github-action/core-registry-action
+          token: ${{ secrets.GHA_TOKEN }}
+
+      - name: push to blockware cloud
+        id: blockware-registry-push
+        uses: ./github-action/core-registry-action
+        with:
+          npmrc: "@blockware:registry=https://europe-npm.pkg.dev/blockware-cloud/blockware-npm-public/"
+          credentials: ${{ secrets.BLOCKWARE_TOKEN }}
+          action: 'push'
+
+      - name: slack - GitHub Actions Slack integration
+        uses: act10ns/slack@v2.0.0
+        with:
+          webhook-url: ${{ secrets.SLACK_WEBHOOK_URL }}
+          status: ${{ job.status }}
+          steps: ${{ toJson(steps) }}
+          channel: '#github-actions'

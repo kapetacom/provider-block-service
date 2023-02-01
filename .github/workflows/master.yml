@@ -34,7 +34,6 @@ jobs:
         id: blockware-registry-push
         uses: ./github-action/core-registry-action
         with:
-          npmrc: "@blockware:registry=https://europe-npm.pkg.dev/blockware-cloud/blockware-npm-public/"
           credentials: ${{ secrets.BLOCKWARE_TOKEN }}
           action: 'push'
 

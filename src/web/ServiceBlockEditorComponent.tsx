@@ -13,10 +13,6 @@ import type {
 } from "@blockware/ui-web-types";
 
 import {
-    BlockType
-} from "@blockware/ui-web-types";
-
-import {
     TabContainer,
     TabPage,
     DataTypeEditor,
@@ -60,7 +56,7 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                 kind: '',
                 options: {},
 
-            }, type: BlockType.SERVICE
+            }
         };
 
         this.originalTargetKind = this.spec.target.kind;

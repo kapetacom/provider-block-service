@@ -104,8 +104,8 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
                 `${targetConfig.kind}:${targetConfig.version}`;
             options[key] = title;
         };
-        BlockTargetProvider.list(this.props.kind)
-            .forEach(addTarget);
+
+        BlockTargetProvider.listAll(this.props.kind).forEach(addTarget);
         if (this.originalTargetKind &&
             !options[this.originalTargetKind]) {
             //Always add the current target if not already added.

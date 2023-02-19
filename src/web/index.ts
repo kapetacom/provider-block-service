@@ -1,5 +1,5 @@
 import { BlockConfig } from "@blockware/ui-web-types";
-import ServiceBlockEditorComponent from './ServiceBlockEditorComponent';
+import {ServiceBlockEditorComponent} from './ServiceBlockEditorComponent';
 import ServiceBlockValidation from './ServiceBlockValidation';
 const blockDefinition = require('../../blockware.yml');
 const packageJson = require('../../package.json');

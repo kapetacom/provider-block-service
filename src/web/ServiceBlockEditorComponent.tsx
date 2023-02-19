@@ -1,179 +1,99 @@
-import React, {Component} from "react";
-import _ from "lodash";
-import {action, makeObservable, observable, toJS} from "mobx";
-import {observer} from "mobx-react";
+import React, {ComponentType, useMemo} from "react";
 
-import type {
-    Type,
-    BlockMetadata,
-    BlockServiceSpec,
-    TargetConfigProps,
-    EntityConfigProps,
-    TargetConfig
-} from "@blockware/ui-web-types";
+import type {TargetConfig} from "@blockware/ui-web-types";
 
 import {
+    DataTypeEditor,
+    DSL_LANGUAGE_ID,
+    DSLConverters,
+    DSLEntity,
+    FormField,
+    FormFieldType,
     TabContainer,
     TabPage,
-    DataTypeEditor,
-    DSLDataType,
-    DSLConverters,
-    DSL_LANGUAGE_ID, DSLEntity, FormSelect
+    useFormContextField
 } from "@blockware/ui-web-components";
 
-import {
-    BlockTargetProvider
-} from "@blockware/ui-web-context";
-
+import {BlockTargetProvider} from "@blockware/ui-web-context";
 
 import './ServiceBlockEditorComponent.less';
 
+interface Props {
+    creating?:boolean
+}
 
+export const ServiceBlockEditorComponent = (props:Props) => {
 
-@observer
-class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, BlockServiceSpec>, any> {
+    const kindField = useFormContextField('kind');
+    const targetKindField = useFormContextField('spec.target.kind');
+    const entitiesField = useFormContextField('spec.entities');
 
-    @observable
-    private readonly metadata: BlockMetadata;
+    const targetKind = targetKindField.get();
+    const kind = kindField.get();
 
-    @observable
-    private readonly spec: BlockServiceSpec;
+    const targetDropdownOptions = useMemo(() => {
+        const options: { [key: string]: string } = {};
 
-    private readonly originalTargetKind:string
+        let defaultTarget:string|null = null;
 
-    constructor(props: EntityConfigProps) {
-        super(props);
-        makeObservable(this);
-
-        this.metadata = !_.isEmpty(this.props.metadata) ? _.cloneDeep(this.props.metadata) : {
-            name: '',
-            title: ''
-        };
-
-
-        this.spec = !_.isEmpty(this.props.spec) ? _.cloneDeep(this.props.spec) : {
-            target: {
-                kind: '',
-                options: {},
-
-            }
-        };
-
-        this.originalTargetKind = this.spec.target.kind;
-
-        if (!this.spec.entities) {
-            this.spec.entities = {
-                types: [],
-                source: {
-                    type: DSL_LANGUAGE_ID,
-                    value: ''
-                }
-            };
-        }
-    }
-
-    private invokeDataChanged() {
-        this.props.onDataChanged(toJS(this.metadata), toJS(this.spec));
-    }
-
-    @action
-    private handleTargetConfigurationChange(config: Object) {
-        this.spec.target.options = config;
-
-        this.invokeDataChanged();
-    }
-
-    @action
-    private handleMetaDataChanged(inputName: string, userInput: string) {
-        this.metadata[inputName] = userInput;
-
-        this.invokeDataChanged();
-    }
-
-    @action
-    private createDropdownOptions() {
-        let options: { [key: string]: string } = {};
         const addTarget = (targetConfig:TargetConfig) => {
             const key = `${targetConfig.kind.toLowerCase()}:${targetConfig.version.toLowerCase()}`;
+            if (!defaultTarget) {
+                defaultTarget = key;
+            }
             const title = targetConfig.title ?
                 `${targetConfig.title} [${targetConfig.kind.toLowerCase()}:${targetConfig.version}]` :
                 `${targetConfig.kind}:${targetConfig.version}`;
             options[key] = title;
         };
 
-        BlockTargetProvider.listAll(this.props.kind).forEach(addTarget);
-        if (this.originalTargetKind &&
-            !options[this.originalTargetKind]) {
+        BlockTargetProvider.listAll(kind).forEach(addTarget);
+        if (targetKind && !options[targetKind]) {
             //Always add the current target if not already added.
             //This usually happens if block uses an older version
-            const currentTarget = BlockTargetProvider.get(this.originalTargetKind, this.props.kind);
-            if (currentTarget) {
-                addTarget(currentTarget);
+            try {
+                const currentTarget = BlockTargetProvider.get(targetKind, kind);
+                if (currentTarget) {
+                    addTarget(currentTarget);
+                }
+            } catch (e) {
+                console.warn('Failed to select target', e);
             }
         }
         return options;
-    }
+    }, [kind, targetKind]);
 
-    @action
-    private handleTargetKindChanged = (name: string, value: string) => {
-        if (this.spec.target.kind === value) {
-            return;
-        }
+    const TargetConfigComponent: ComponentType | null = useMemo(() => {
+        if (targetKind) {
+            try {
+                const currentTarget = BlockTargetProvider.get(targetKind, kind);
 
-        this.spec.target.kind = value;
-        this.spec.target.options = {};
-
-        this.invokeDataChanged();
-    }
-
-
-    private renderTargetConfig() {
-        let TargetConfigComponent: Type<Component<TargetConfigProps, any>> | null = null;
-        if (this.spec.target.kind) {
-            const currentTarget = BlockTargetProvider.get(this.spec.target.kind, this.props.kind);
-
-            if (currentTarget && currentTarget.componentType) {
-                TargetConfigComponent = currentTarget.componentType;
+                if (currentTarget && currentTarget.componentType) {
+                    return currentTarget.componentType;
+                }
+            } catch (e) {
+                console.warn('Failed to select target', e);
             }
         }
+        return null;
+    }, [targetKind]);
 
+    const renderTargetConfig = () => {
         if (!TargetConfigComponent) {
             return <div></div>;
         }
 
         return (
             <div className="form-section">
-                <span>Target configuration</span>
-                <TargetConfigComponent
-                    value={this.spec.target.options ? toJS(this.spec.target.options) : {}}
-                    onOptionsChanged={(config: Object) => {
-                        this.handleTargetConfigurationChange(config)
-                    }}/>
+                <h3>Target configuration</h3>
+                <TargetConfigComponent />
             </div>
         );
     }
 
-    private renderForm() {
-        return (
-            <>
+    const renderEntities = () => {
 
-                <FormSelect
-                    name={"targetKind"}
-                    value={this.spec.target?.kind?.toLowerCase()}
-                    label={"Target"}
-                    validation={['required']}
-                    help={"This tells the code generation process which target programming language to use."}
-                    onChange={this.handleTargetKindChanged}
-                    options={this.createDropdownOptions()}
-                />
-
-                {this.renderTargetConfig()}
-            </>
-        )
-    }
-
-    private renderEntities() {
-        const entities = this.spec.entities;
+        const entities = entitiesField.get();
 
         const result = {
             code: entities?.source?.value || '',
@@ -183,45 +103,48 @@ class ServiceBlockComponent extends Component<EntityConfigProps<BlockMetadata, B
         return (
             <div className={'entity-editor'}>
                 <DataTypeEditor value={result} onChange={(result) => {
-                    result.entities && this.setEntities(result.code, result.entities);
+                    result.entities && setEntities(result.code, result.entities);
                 }} />
             </div>
         )
     }
 
-    @action
-    private setEntities(code:string, results: DSLEntity[]) {
+    const setEntities = (code:string, results: DSLEntity[]) =>  {
         const types = results.map(DSLConverters.toSchemaEntity);
-        this.spec.entities = {
+        const entities = {
             types,
             source: {
                 type: DSL_LANGUAGE_ID,
                 value: code
             }
         };
-        this.invokeDataChanged();
+        entitiesField.set(entities);
     }
 
-    render() {
+    return (
+        <div className={'service-block-config'}>
+            <TabContainer defaultTab={'general'}>
+                <TabPage id={'general'} title={'General'}>
+                    <FormField
+                        name={"spec.target.kind"}
+                        type={FormFieldType.ENUM}
+                        label={"Target"}
+                        validation={['required']}
+                        help={"This tells the code generation process which target programming language to use."}
+                        options={targetDropdownOptions}
+                    />
 
-        return (
-            <div className={'service-block-config'}>
-                <TabContainer defaultTab={'general'}>
-                    <TabPage id={'general'} title={'General'}>
-                        {this.renderForm()}
+                    {renderTargetConfig()}
+                </TabPage>
+
+                {!props.creating &&
+                    <TabPage id={'entities'} title={'Entities'}>
+                        {renderEntities()}
                     </TabPage>
+                }
 
-                    {!this.props.creating &&
-                        <TabPage id={'entities'} title={'Entities'}>
-                            {this.renderEntities()}
-                        </TabPage>
-                    }
+            </TabContainer>
 
-                </TabContainer>
-
-            </div>
-        )
-    }
-}
-
-export default ServiceBlockComponent;
+        </div>
+    )
+};

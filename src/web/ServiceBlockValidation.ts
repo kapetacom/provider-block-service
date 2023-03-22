@@ -1,11 +1,11 @@
 import {
     BlockKind,
     BlockServiceSpec
-} from "@blockware/ui-web-types";
+} from "@kapeta/ui-web-types";
 
 import {
     BlockTargetProvider
-} from "@blockware/ui-web-context";
+} from "@kapeta/ui-web-context";
 
 export default function(block:BlockKind<BlockServiceSpec>) {
     const errors:string[] = [];

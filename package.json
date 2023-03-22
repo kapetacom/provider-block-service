@@ -1,9 +1,9 @@
 {
-  "name": "@blockware/block-type-service",
+  "name": "@kapeta/block-type-service",
   "version": "local",
   "description": "Provides block type for backend microservices",
   "keywords": [
-    "blockware"
+    "kapeta"
   ],
   "private": false,
   "publishConfig": {
@@ -18,16 +18,16 @@
     "storybook": "start-storybook"
   },
   "peerDependencies": {
-    "@blockware/ui-web-components": "<2",
-    "@blockware/ui-web-context": "<2",
-    "@blockware/ui-web-types": "<2",
-    "@blockware/ui-web-utils": "<2"
+    "@kapeta/ui-web-components": "<2",
+    "@kapeta/ui-web-context": "<2",
+    "@kapeta/ui-web-types": "<2",
+    "@kapeta/ui-web-utils": "<2"
   },
   "devDependencies": {
-    "@blockware/ui-web-components": "<2",
-    "@blockware/ui-web-context": "<2",
-    "@blockware/ui-web-types": "<2",
-    "@blockware/ui-web-utils": "<2",
+    "@kapeta/ui-web-components": "<2",
+    "@kapeta/ui-web-context": "<2",
+    "@kapeta/ui-web-types": "<2",
+    "@kapeta/ui-web-utils": "<2",
     "@babel/cli": "^7.18.10",
     "@babel/core": "^7.19.1",
     "@babel/plugin-proposal-class-properties": "^7.18.6",

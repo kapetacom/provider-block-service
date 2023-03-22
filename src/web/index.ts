@@ -1,7 +1,7 @@
-import { BlockConfig } from "@blockware/ui-web-types";
-import {ServiceBlockEditorComponent} from './ServiceBlockEditorComponent';
+import { BlockConfig } from "@kapeta/ui-web-types";
+import ServiceBlockEditorComponent from './ServiceBlockEditorComponent';
 import ServiceBlockValidation from './ServiceBlockValidation';
-const blockDefinition = require('../../blockware.yml');
+const blockDefinition = require('../../kapeta.yml');
 const packageJson = require('../../package.json');
 
 const blockType:BlockConfig = {

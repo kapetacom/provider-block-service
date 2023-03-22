@@ -6,13 +6,13 @@ import {
     SchemaEntityType,
     SchemaKind,
     TargetConfig
-} from '@blockware/ui-web-types';
-import {BlockTargetProvider} from '@blockware/ui-web-context';
+} from '@kapeta/ui-web-types';
+import {BlockTargetProvider} from '@kapeta/ui-web-context';
 import ServiceBlockEditorComponent from '../src/web/ServiceBlockEditorComponent';
 
-import '@blockware/ui-web-components/styles/index.less';
+import '@kapeta/ui-web-components/styles/index.less';
 
-const BLOCK_KIND = 'blockware/block-type-service';
+const BLOCK_KIND = 'kapeta/block-type-service';
 
 const targetConfig: TargetConfig = {
     kind: 'my-language-target',
@@ -35,7 +35,7 @@ const ServiceBlock: SchemaKind<BlockServiceSpec, BlockMetadata> = {
         },
         entities: {
             source: {
-                type: 'blockware-dsl',
+                type: 'kapeta-dsl',
                 value: ''
             },
             types: [

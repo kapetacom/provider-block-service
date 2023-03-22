@@ -1,6 +1,6 @@
 import React, {ComponentType, useMemo} from "react";
 
-import type {TargetConfig} from "@blockware/ui-web-types";
+import type {TargetConfig} from "@kapeta/ui-web-types";
 
 import {
     DataTypeEditor,
@@ -12,9 +12,9 @@ import {
     TabContainer,
     TabPage,
     useFormContextField
-} from "@blockware/ui-web-components";
+} from "@kapeta/ui-web-components";
 
-import {BlockTargetProvider} from "@blockware/ui-web-context";
+import {BlockTargetProvider} from "@kapeta/ui-web-context";
 
 import './ServiceBlockEditorComponent.less';
 

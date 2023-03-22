@@ -1,5 +1,5 @@
 import { BlockConfig } from "@kapeta/ui-web-types";
-import ServiceBlockEditorComponent from './ServiceBlockEditorComponent';
+import {ServiceBlockEditorComponent} from './ServiceBlockEditorComponent';
 import ServiceBlockValidation from './ServiceBlockValidation';
 const blockDefinition = require('../../kapeta.yml');
 const packageJson = require('../../package.json');

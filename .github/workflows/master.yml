@@ -29,15 +29,15 @@ jobs:
       - name: checkout action
         uses: actions/checkout@v3
         with:
-          repository: blockwarecom/core-registry-action
+          repository: kapetacom/core-registry-action
           path: ./github-action/core-registry-action
           token: ${{ secrets.GHA_TOKEN }}
 
-      - name: push to blockware cloud
-        id: blockware-registry-push
+      - name: push to kapeta cloud
+        id: kapeta-registry-push
         uses: ./github-action/core-registry-action
         with:
-          credentials: ${{ secrets.BLOCKWARE_TOKEN }}
+          credentials: ${{ secrets.KAPETA_TOKEN }}
           action: 'push'
 
       - name: slack - GitHub Actions Slack integration

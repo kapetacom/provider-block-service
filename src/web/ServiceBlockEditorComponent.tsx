@@ -1,6 +1,6 @@
 import React, {ComponentType, useMemo} from "react";
 
-import type {TargetConfig} from "@kapeta/ui-web-types";
+import type {ILanguageTargetProvider} from "@kapeta/ui-web-types";
 
 import {
     DataTypeEditor,
@@ -36,7 +36,7 @@ export const ServiceBlockEditorComponent = (props:Props) => {
 
         let defaultTarget:string|null = null;
 
-        const addTarget = (targetConfig:TargetConfig) => {
+        const addTarget = (targetConfig:ILanguageTargetProvider) => {
             const key = `${targetConfig.kind.toLowerCase()}:${targetConfig.version.toLowerCase()}`;
             if (!defaultTarget) {
                 defaultTarget = key;

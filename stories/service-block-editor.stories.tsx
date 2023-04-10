@@ -1,35 +1,41 @@
-import React, {useState} from 'react';
+import React, {useMemo, useState} from 'react';
 import {
-    BlockMetadata,
-    BlockServiceSpec,
-    BlockType,
-    SchemaEntityType,
+    IBlockTypeProvider,
     SchemaKind,
-    TargetConfig
+    ILanguageTargetProvider
 } from '@kapeta/ui-web-types';
 import {BlockTargetProvider} from '@kapeta/ui-web-context';
-import ServiceBlockEditorComponent from '../src/web/ServiceBlockEditorComponent';
+import {ServiceBlockEditorComponent} from '../src/web/ServiceBlockEditorComponent';
 
 import '@kapeta/ui-web-components/styles/index.less';
+import {BlockDefinition} from "@kapeta/schemas";
+import {EntityType} from "@kapeta/schemas/dist/cjs";
+import {FormContainer} from "@kapeta/ui-web-components";
 
 const BLOCK_KIND = 'kapeta/block-type-service';
 
-const targetConfig: TargetConfig = {
+const targetConfig: ILanguageTargetProvider = {
     kind: 'my-language-target',
-    name: 'My Language Target',
+    title: 'My Language Target',
+    version: '1.2.3',
     blockKinds: [
         BLOCK_KIND
-    ]
+    ],
+    definition: {
+        kind: 'my-language-target',
+        metadata: {
+            name: 'kapeta/test',
+        }
+    }
 };
 
-const ServiceBlock: SchemaKind<BlockServiceSpec, BlockMetadata> = {
+const ServiceBlock: BlockDefinition = {
     kind: BLOCK_KIND,
     metadata: {
         name: 'My block',
         version: '1.2.3'
     },
     spec: {
-        type: BlockType.SERVICE,
         target: {
             kind: targetConfig.kind
         },
@@ -40,7 +46,7 @@ const ServiceBlock: SchemaKind<BlockServiceSpec, BlockMetadata> = {
             },
             types: [
                 {
-                    type: SchemaEntityType.DTO,
+                    type: EntityType.Dto,
                     name: 'MyEntity',
                     properties: {
                         'id': {
@@ -78,19 +84,21 @@ export default {
 
 export const CreateEditor = () => {
 
-    const [definition, setDefinition] = useState({kind:BLOCK_KIND,metadata:{name:'', version:''},spec:{type:BlockType.SERVICE,target:{kind:''}}});
+    const initial:BlockDefinition = useMemo(() => {
+        return {kind:BLOCK_KIND,metadata:{name:'', version:''},spec:{target:{kind:''}}};
+    }, [])
+
+    const [definition, setDefinition] = useState<BlockDefinition>(initial);
 
     return (
-        <ServiceBlockEditorComponent {...definition}
-                                     creating={true}
-                                     onDataChanged={((metadata, spec) => {
-                                         setDefinition({
-                                             kind: ServiceBlock.kind,
-                                             metadata,
-                                             spec
-                                         });
-                                         console.log('Data changed', metadata, spec);
-                                     })}/>
+        <FormContainer initialValue={initial}
+                       onChange={(data) => {
+                           setDefinition(data);
+                           console.log('Data changed', data);
+                       }}>
+
+        <ServiceBlockEditorComponent creating={true} />
+        </FormContainer>
     )
 };
 
@@ -99,16 +107,12 @@ export const EditEditor = () => {
     const [definition, setDefinition] = useState(ServiceBlock);
 
     return (
-        <ServiceBlockEditorComponent {...definition}
-                                     creating={false}
-                                     onDataChanged={((metadata, spec) => {
-            setDefinition({
-                kind: ServiceBlock.kind,
-                metadata,
-                spec
-            });
-            console.log('Data changed', metadata, spec);
-
-        })}/>
+        <FormContainer initialValue={ServiceBlock}
+                       onChange={(data) => {
+                           setDefinition(data);
+                           console.log('Data changed', data);
+                       }}>
+            <ServiceBlockEditorComponent creating={false} />
+        </FormContainer>
     )
 };

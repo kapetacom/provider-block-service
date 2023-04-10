@@ -1,13 +1,11 @@
-import {
-    BlockKind,
-    BlockServiceSpec
-} from "@kapeta/ui-web-types";
 
 import {
     BlockTargetProvider
 } from "@kapeta/ui-web-context";
 
-export default function(block:BlockKind<BlockServiceSpec>) {
+import {BlockDefinition} from "@kapeta/schemas";
+
+export default function(block:BlockDefinition) {
     const errors:string[] = [];
 
     if (!block.spec.target) {

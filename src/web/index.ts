@@ -7,7 +7,7 @@ const packageJson = require('../../package.json');
 const blockTypeProvider:IBlockTypeProvider = {
     kind: blockDefinition.metadata.name,
     version: packageJson.version,
-    title: blockDefinition.metadata.title,
+    title: blockDefinition.metadata.title || blockDefinition.metadata.name,
     validate: ServiceBlockValidation,
     componentType: ServiceBlockEditorComponent,
     definition: blockDefinition

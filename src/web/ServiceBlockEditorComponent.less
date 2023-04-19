@@ -6,15 +6,27 @@
     width: 100%;
     .tab-container,
     .tab-page,
-    .entity-editor {
+    .entity-editor,
+    .configuration-editor {
         height: 100%;
         width: 100%;
         box-sizing: border-box;
     }
-
-    .entity-editor {
+    .entity-editor,
+    .configuration-editor {
         position: relative;
+        display: flex;
+        flex-direction: column;
     }
+
+    p.info {
+        font-size: 12px;
+        background-color: @gray-light;
+        padding:10px;
+        margin:0;
+        margin-bottom:10px;
+    }
+
 
     .tab-container {
         display: flex;

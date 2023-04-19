@@ -1,15 +1,10 @@
 import React, {useMemo, useState} from 'react';
-import {
-    IBlockTypeProvider,
-    SchemaKind,
-    ILanguageTargetProvider
-} from '@kapeta/ui-web-types';
+import {ILanguageTargetProvider} from '@kapeta/ui-web-types';
 import {BlockTargetProvider} from '@kapeta/ui-web-context';
 import {ServiceBlockEditorComponent} from '../src/web/ServiceBlockEditorComponent';
 
 import '@kapeta/ui-web-components/styles/index.less';
-import {BlockDefinition} from "@kapeta/schemas";
-import {EntityType} from "@kapeta/schemas/dist/cjs";
+import {EntityType, BlockDefinition, Entity, EntityProperty} from "@kapeta/schemas";
 import {FormContainer} from "@kapeta/ui-web-components";
 
 const BLOCK_KIND = 'kapeta/block-type-service';
@@ -29,15 +24,42 @@ const targetConfig: ILanguageTargetProvider = {
     }
 };
 
+
 const ServiceBlock: BlockDefinition = {
     kind: BLOCK_KIND,
     metadata: {
         name: 'My block',
-        version: '1.2.3'
     },
     spec: {
         target: {
-            kind: targetConfig.kind
+            kind: targetConfig.kind,
+        },
+        configuration: {
+            source: {
+                type: 'kapeta-dsl',
+                value: ''
+            },
+            types: [
+                {
+                    name: 'CoreConfig',
+                    type: EntityType.Dto,
+                    properties: {
+                        apiKey: {
+                            type: 'string',
+                            secret: true
+                        },
+                        name: {
+                            type: 'string',
+                            required: true,
+                            defaultValue: '"My Block"'
+                        },
+                        enabled: {
+                            type: 'boolean',
+                            defaultValue: 'true'
+                        },
+                    }
+                }
+            ]
         },
         entities: {
             source: {
@@ -46,33 +68,24 @@ const ServiceBlock: BlockDefinition = {
             },
             types: [
                 {
-                    type: EntityType.Dto,
                     name: 'MyEntity',
+                    type: EntityType.Dto,
                     properties: {
-                        'id': {
+                        id: {
                             type: 'string'
                         },
                         'tags': {
-                            type: 'array',
-                            items: {
-                                type: 'string'
-                            }
+                            type: 'string[]'
                         },
                         'children': {
-                            type: 'array',
-                            items: {
-                                type: 'object',
-                                properties: {
-                                    childId: {
-                                        type: 'integer'
-                                    }
-                                }
-                            }
+                            ref: 'MyEntity[]'
                         }
                     }
                 }
             ]
-        }
+        },
+        consumers: [],
+        providers: [],
     }
 };
 
@@ -109,7 +122,7 @@ export const EditEditor = () => {
     return (
         <FormContainer initialValue={ServiceBlock}
                        onChange={(data) => {
-                           setDefinition(data);
+                           setDefinition(data as BlockDefinition);
                            console.log('Data changed', data);
                        }}>
             <ServiceBlockEditorComponent creating={false} />

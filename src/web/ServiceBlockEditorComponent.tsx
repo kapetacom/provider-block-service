@@ -11,7 +11,8 @@ import {
     FormFieldType,
     TabContainer,
     TabPage,
-    useFormContextField
+    useFormContextField,
+    ConfigurationEditor
 } from "@kapeta/ui-web-components";
 
 import {BlockTargetProvider} from "@kapeta/ui-web-context";
@@ -27,6 +28,7 @@ export const ServiceBlockEditorComponent = (props:Props) => {
     const kindField = useFormContextField('kind');
     const targetKindField = useFormContextField('spec.target.kind');
     const entitiesField = useFormContextField('spec.entities');
+    const configurationField = useFormContextField('spec.configuration');
 
     const targetKind = targetKindField.get();
     const kind = kindField.get();
@@ -91,6 +93,38 @@ export const ServiceBlockEditorComponent = (props:Props) => {
         );
     }
 
+
+
+    const renderConfiguration = () => {
+
+        const configuration = configurationField.get();
+        const result = {
+            code: configuration?.source?.value || '',
+            entities: configuration?.types?.map ? configuration?.types?.map(DSLConverters.fromSchemaEntity) : []
+        };
+
+        return (
+            <div className={'configuration-editor'}>
+                <p className='info'>Define configuration data types for this block</p>
+                <ConfigurationEditor value={result} onChange={(result) => {
+                    result.entities && setConfiguration(result.code, result.entities);
+                }} />
+            </div>
+        )
+    }
+
+    const setConfiguration = (code:string, results: DSLEntity[]) =>  {
+        const types = results.map(DSLConverters.toSchemaEntity);
+        const configuration = {
+            types,
+            source: {
+                type: DSL_LANGUAGE_ID,
+                value: code
+            }
+        };
+        configurationField.set(configuration);
+    }
+
     const renderEntities = () => {
 
         const entities = entitiesField.get();
@@ -102,6 +136,7 @@ export const ServiceBlockEditorComponent = (props:Props) => {
 
         return (
             <div className={'entity-editor'}>
+                <p className='info'>Entities define external data types to be used by the resources for this block</p>
                 <DataTypeEditor value={result} onChange={(result) => {
                     result.entities && setEntities(result.code, result.entities);
                 }} />
@@ -138,9 +173,14 @@ export const ServiceBlockEditorComponent = (props:Props) => {
                 </TabPage>
 
                 {!props.creating &&
-                    <TabPage id={'entities'} title={'Entities'}>
-                        {renderEntities()}
-                    </TabPage>
+                    <>
+                        <TabPage id={'entities'} title={'Entities'}>
+                            {renderEntities()}
+                        </TabPage>
+                        <TabPage id={'configuration'} title={'Configuration'}>
+                            {renderConfiguration()}
+                        </TabPage>
+                    </>
                 }
 
             </TabContainer>

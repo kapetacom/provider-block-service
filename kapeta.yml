@@ -16,6 +16,8 @@ spec:
     properties:
       target:
         $ref: /core/language-target-reference
+      configuration:
+        $ref: /core/entity-list
       entities:
         $ref: /core/entity-list
       consumers:

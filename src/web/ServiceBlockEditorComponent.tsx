@@ -115,7 +115,6 @@ export const ServiceBlockEditorComponent = (props:Props) => {
 
     const setConfiguration = (code:string, results: DSLEntity[]) =>  {
         const types = results.map(DSLConverters.toSchemaEntity);
-        console.log('updates', results, types);
         const configuration = {
             types,
             source: {

@@ -84,8 +84,6 @@ const ServiceBlock: BlockDefinition = {
                 }
             ]
         },
-        consumers: [],
-        providers: [],
     }
 };
 

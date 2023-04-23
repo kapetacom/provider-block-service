@@ -70,8 +70,8 @@ export const ServiceBlockEditorComponent = (props:Props) => {
             try {
                 const currentTarget = BlockTargetProvider.get(targetKind, kind);
 
-                if (currentTarget && currentTarget.componentType) {
-                    return currentTarget.componentType;
+                if (currentTarget && currentTarget.editorComponent) {
+                    return currentTarget.editorComponent;
                 }
             } catch (e) {
                 console.warn('Failed to select target', e);

@@ -9,7 +9,7 @@ const blockTypeProvider:IBlockTypeProvider = {
     version: packageJson.version,
     title: blockDefinition.metadata.title || blockDefinition.metadata.name,
     validate: ServiceBlockValidation,
-    componentType: ServiceBlockEditorComponent,
+    editorComponent: ServiceBlockEditorComponent,
     definition: blockDefinition
 };
 

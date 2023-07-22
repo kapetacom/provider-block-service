@@ -6,18 +6,19 @@ import {ServiceBlockEditorComponent} from '../src/web/ServiceBlockEditorComponen
 import '@kapeta/ui-web-components/styles/index.less';
 import {EntityType, BlockDefinition, Entity, EntityProperty} from "@kapeta/schemas";
 import {FormContainer} from "@kapeta/ui-web-components";
+import './index.less';
 
 const BLOCK_KIND = 'kapeta/block-type-service';
 
 const targetConfig: ILanguageTargetProvider = {
-    kind: 'my-language-target',
+    kind: 'kapeta/my-language-target',
     title: 'My Language Target',
     version: '1.2.3',
     blockKinds: [
         BLOCK_KIND
     ],
     definition: {
-        kind: 'my-language-target',
+        kind: 'kapeta/my-language-target',
         metadata: {
             name: 'kapeta/test',
         }
@@ -32,7 +33,7 @@ const ServiceBlock: BlockDefinition = {
     },
     spec: {
         target: {
-            kind: targetConfig.kind,
+            kind: targetConfig.kind + ':1.2.3',
         },
         configuration: {
             source: {
@@ -102,14 +103,17 @@ export const CreateEditor = () => {
     const [definition, setDefinition] = useState<BlockDefinition>(initial);
 
     return (
+        <div style={{minHeight:'500px'}}>
         <FormContainer initialValue={initial}
+
                        onChange={(data) => {
-                           setDefinition(data);
+                           setDefinition(data as BlockDefinition);
                            console.log('Data changed', data);
                        }}>
 
         <ServiceBlockEditorComponent creating={true} />
         </FormContainer>
+        </div>
     )
 };
 
@@ -118,6 +122,7 @@ export const EditEditor = () => {
     const [definition, setDefinition] = useState(ServiceBlock);
 
     return (
+        <div style={{height:'500px'}}>
         <FormContainer initialValue={ServiceBlock}
                        onChange={(data) => {
                            setDefinition(data as BlockDefinition);
@@ -125,5 +130,6 @@ export const EditEditor = () => {
                        }}>
             <ServiceBlockEditorComponent creating={false} />
         </FormContainer>
+        </div>
     )
 };

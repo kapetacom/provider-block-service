@@ -3,21 +3,23 @@ import React, {ComponentType, useMemo} from "react";
 import type {ILanguageTargetProvider} from "@kapeta/ui-web-types";
 
 import {
+    FormAvatarEditorField,
+    ConfigurationEditor,
     DataTypeEditor,
     DSL_LANGUAGE_ID,
     DSLConverters,
     DSLEntity,
     FormField,
-    FormFieldType,
+    FormFieldType, FormRow,
     TabContainer,
     TabPage,
-    useFormContextField,
-    ConfigurationEditor
+    useFormContextField
 } from "@kapeta/ui-web-components";
 
 import {BlockTargetProvider} from "@kapeta/ui-web-context";
 
 import './ServiceBlockEditorComponent.less';
+import {IconType, IconValue} from "@kapeta/schemas";
 
 interface Props {
     creating?:boolean
@@ -29,6 +31,7 @@ export const ServiceBlockEditorComponent = (props:Props) => {
     const targetKindField = useFormContextField('spec.target.kind');
     const entitiesField = useFormContextField('spec.entities');
     const configurationField = useFormContextField('spec.configuration');
+    const iconField = useFormContextField('spec.icon');
 
     const targetKind = targetKindField.get();
     const kind = kindField.get();
@@ -160,6 +163,14 @@ export const ServiceBlockEditorComponent = (props:Props) => {
         <div className={'service-block-config'}>
             <TabContainer defaultTab={'general'}>
                 <TabPage id={'general'} title={'General'}>
+                    <p className='info'>Service block that describes a backend exposing functionality such as APIs</p>
+                    <FormAvatarEditorField
+                        name={'spec.icon'}
+                        label={'Icon'}
+                        maxFileSize={1024 * 50}
+                        help={'Select an icon for this block to make it easier to identify. Max 50 kb - and we recommend using a square SVG image.'}
+                        fallbackIcon={'kap-icon-block'}
+                    />
                     <FormField
                         name={"spec.target.kind"}
                         type={FormFieldType.ENUM}

@@ -23,6 +23,7 @@
     "@kapeta/ui-web-types": "<2",
     "@kapeta/ui-web-utils": "<2"
   },
+  "bundledDependencies": true,
   "devDependencies": {
     "@babel/cli": "^7.18.10",
     "@babel/core": "^7.19.1",

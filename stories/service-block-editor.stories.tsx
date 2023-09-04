@@ -18,9 +18,26 @@ const targetConfig: ILanguageTargetProvider = {
         BLOCK_KIND
     ],
     definition: {
-        kind: 'kapeta/my-language-target',
+        kind: 'kapeta/language-target',
         metadata: {
-            name: 'kapeta/test',
+            name: 'kapeta/my-language-target',
+        }
+    }
+};
+
+
+const targetConfig2: ILanguageTargetProvider = {
+    kind: 'kapeta/my-other-target',
+    title: 'My Other Target',
+    version: '1.2.3',
+    blockKinds: [
+        BLOCK_KIND
+    ],
+    definition: {
+        kind: 'kapeta/language-target',
+        metadata: {
+            name: 'kapeta/my-other-target',
+            title: 'Other target'
         }
     }
 };
@@ -89,6 +106,7 @@ const ServiceBlock: BlockDefinition = {
 };
 
 BlockTargetProvider.register(targetConfig);
+BlockTargetProvider.register(targetConfig2);
 
 export default {
     title: 'Service Block'

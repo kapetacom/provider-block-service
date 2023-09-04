@@ -40,14 +40,11 @@ export const ServiceBlockEditorComponent = (props:Props) => {
     const assetTypes:AssetVersionSelectorEntry[] = useMemo(() => {
         const mapper = (targetConfig:ILanguageTargetProvider):AssetVersionSelectorEntry => {
             const ref = `${targetConfig.kind}:${targetConfig.version}`;
-            const title = targetConfig.title ?
-                `${targetConfig.title} [${targetConfig.kind.toLowerCase()}:${targetConfig.version}]` :
-                `${targetConfig.kind}:${targetConfig.version}`;
 
             return {
                 ref: ref,
                 kind: targetConfig.definition?.kind ?? targetConfig.kind,
-                title,
+                title: targetConfig.title ?? targetConfig.definition?.metadata?.title,
                 icon: targetConfig.icon ?? targetConfig.definition?.spec?.icon
             }
         };

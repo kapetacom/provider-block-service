@@ -31,3 +31,5 @@ spec:
         $ref: /core/block-resource-list
     required:
       - target
+  defaultPort:
+    type: rest

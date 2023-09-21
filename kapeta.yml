@@ -2,6 +2,8 @@ kind: core/block-type
 metadata:
   name: kapeta/block-type-service
   title: Service
+  description: Provides backend service capabilities.
+  visibility: public
 spec:
   icon:
     type: url

@@ -10,6 +10,11 @@
     "access": "public"
   },
   "license": "MIT",
+  "author": {
+    "email": "engineering@kapeta.com",
+    "name": "Kapeta",
+    "url": "https://kapeta.com"
+  },
   "scripts": {
     "prepublishOnly": "npm run build",
     "build": "NODE_ENV=production webpack",

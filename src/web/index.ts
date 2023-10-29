@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
 import { IBlockTypeProvider } from "@kapeta/ui-web-types";
 import {ServiceBlockEditorComponent} from './ServiceBlockEditorComponent';
 import ServiceBlockValidation from './ServiceBlockValidation';

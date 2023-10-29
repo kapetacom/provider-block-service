@@ -1,3 +1,8 @@
+/**
+ * Copyright 2023 Kapeta Inc.
+ * SPDX-License-Identifier: MIT
+ */
+
 import React, {ComponentType, useMemo} from "react";
 
 import type {ILanguageTargetProvider} from "@kapeta/ui-web-types";

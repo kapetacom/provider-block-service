@@ -27,12 +27,12 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: push to kapeta cloud
+      - name: Publish to Kapeta
         id: kapeta-registry-push
-        uses: kapetacom/core-registry-action@v1
+        uses: kapetacom/core-registry-action@v3
         with:
           credentials: ${{ secrets.KAPETA_TOKEN }}
-          action: 'push'
+          action: publish
 
       - name: slack - GitHub Actions Slack integration
         uses: act10ns/slack@v2.0.0

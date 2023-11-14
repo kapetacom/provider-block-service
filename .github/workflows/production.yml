@@ -1,9 +1,8 @@
-name: Master build
-# trigger on push to master
+name: Production build
 on:
   push:
     branches:
-      - master
+      - production
   workflow_dispatch:
 jobs:
   relase:
@@ -32,8 +31,6 @@ jobs:
         uses: kapetacom/core-registry-action@v4
         with:
           credentials: ${{ secrets.KAPETA_TOKEN }}
-          staging: true
-          base_url: ${{ secrets.KAPETA_STAGING_URL }}
           action: publish
 
       - name: slack - GitHub Actions Slack integration

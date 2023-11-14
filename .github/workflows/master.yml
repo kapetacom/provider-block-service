@@ -31,7 +31,7 @@ jobs:
         id: kapeta-registry-push
         uses: kapetacom/core-registry-action@v4
         with:
-          credentials: ${{ secrets.KAPETA_TOKEN }}
+          credentials: ${{ secrets.KAPETA_TOKEN_STAGING }}
           staging: true
           base_url: ${{ secrets.KAPETA_STAGING_URL }}
           action: publish

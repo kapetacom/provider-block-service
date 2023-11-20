@@ -31,6 +31,7 @@ jobs:
         uses: kapetacom/core-registry-action@v4
         with:
           credentials: ${{ secrets.KAPETA_TOKEN }}
+          release_branch: production
           action: publish
 
       - name: slack - GitHub Actions Slack integration

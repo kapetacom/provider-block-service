@@ -3,15 +3,12 @@
  * SPDX-License-Identifier: MIT
  */
 
+import { BlockTargetProvider } from '@kapeta/ui-web-context';
 
-import {
-    BlockTargetProvider
-} from "@kapeta/ui-web-context";
+import { BlockDefinition } from '@kapeta/schemas';
 
-import {BlockDefinition} from "@kapeta/schemas";
-
-export default function(block:BlockDefinition) {
-    const errors:string[] = [];
+export default function (block: BlockDefinition) {
+    const errors: string[] = [];
 
     if (!block.spec.target) {
         errors.push('Missing target configuration');
@@ -19,8 +16,7 @@ export default function(block:BlockDefinition) {
         errors.push('Missing target kind');
     }
 
-    if (block.spec.target &&
-        block.spec.target.kind) {
+    if (block.spec.target && block.spec.target.kind) {
         const blockTarget = BlockTargetProvider.get(block.spec.target.kind, block.kind);
         if (!blockTarget) {
             errors.push('Target kind not available');
@@ -32,4 +28,4 @@ export default function(block:BlockDefinition) {
     }
 
     return errors;
-};
+}

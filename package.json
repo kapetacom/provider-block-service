@@ -20,7 +20,9 @@
     "build": "NODE_ENV=production webpack",
     "start": "npm run watch",
     "watch": "NODE_ENV=development webpack --watch",
-    "storybook": "start-storybook"
+    "storybook": "start-storybook",
+    "lint:tsc": "tsc --noEmit",
+    "format": "prettier --write ."
   },
   "peerDependencies": {
     "@kapeta/ui-web-components": "^3.9.4",

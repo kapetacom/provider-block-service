@@ -33,7 +33,6 @@
     "noImplicitThis": true,
     "noImplicitAny": true,
     "strictNullChecks": true,
-    "suppressImplicitAnyIndexErrors": true,
     "noUnusedLocals": false,
     "allowSyntheticDefaultImports": true,
     "emitDecoratorMetadata": true,

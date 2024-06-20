@@ -94,7 +94,7 @@ export const ServiceBlockEditorComponent = (props:Props) => {
 
     return (
         <div>
-            <InfoBox>Service block that describes a backend exposing functionality such as APIs</InfoBox>
+            <InfoBox sx={{my:1}}>Service block that describes a backend exposing functionality such as APIs</InfoBox>
             <FormAvatarEditorField
                 name={'spec.icon'}
                 label={'Icon'}
